@@ -1,6 +1,6 @@
 name: CD
 
-on:
+onnnnnnnnnn:
   push:
     branches:
     - master
