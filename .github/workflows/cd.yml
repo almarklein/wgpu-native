@@ -113,7 +113,7 @@ jobs:
   Release:
     needs: Build
     runs-on: ubuntu-16.04
-    if: success() and github.event_name == 'tag'
+    if: success() && github.event_name == 'tag'
     steps:
     - uses: actions/checkout@v2
     - name: Download assets
