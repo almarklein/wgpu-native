@@ -27,7 +27,7 @@ jobs:
         path: commit-sha
         name: dist
 
-    Release:
+  Release:
     needs: Prepare
     runs-on: ubuntu-16.04
     if: success()  # and github.event_name == 'tag'
