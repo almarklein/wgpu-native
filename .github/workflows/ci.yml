@@ -13,8 +13,7 @@ on:
 jobs:
 
   # Prepare a file containing the commit sha, to be included in the releases
-  Prepare:
-    if: github.event_name == 'tag'
+  prepare:
     name: Prepare for builds
     runs-on: ubuntu-18.04
     steps:
@@ -117,7 +116,7 @@ jobs:
   # libraries, and thus works on as may linuxes as possible. It's a thing from the
   # Python world, but generally useful.
   release-build:
-    needs: Prepare
+    needs: prepare
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
