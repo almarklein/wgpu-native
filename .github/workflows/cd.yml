@@ -27,10 +27,93 @@ jobs:
         path: commit-sha
         name: dist
 
-  Release:
+Build:
     needs: Prepare
+    runs-on: ${{ matrix.vmImage }}
+    strategy:
+      matrix:
+        include:
+          - name: Linux-64
+            vmImage: ubuntu-16.04
+            RUST_TOOLCHAIN: stable
+            ARCH: 64
+            OS_NAME: linux
+            IMAGE: manylinux2010_x86_64
+          - name: Linux-32
+            vmImage: ubuntu-16.04
+            RUST_TOOLCHAIN: stable-i686-unknown-linux-gnu
+            ARCH: 32
+            OS_NAME: linux
+            IMAGE: manylinux2010_i686
+          - name: MacOS-64
+            vmImage: macOS-10.14
+            RUST_TOOLCHAIN: stable
+            ARCH: 64
+            OS_NAME: macos
+            MACOSX_DEPLOYMENT_TARGET: '10.13'
+          - name: Windows-64
+            vmImage: vs2017-win2016
+            RUST_TOOLCHAIN: stable-msvc
+            ARCH: 64
+            OS_NAME: windows
+          - name: Windows-32
+            vmImage: vs2017-win2016
+            RUST_TOOLCHAIN: stable-i686-pc-windows-msvc
+            ARCH: 32
+            OS_NAME: windows
+    steps:
+    - uses: actions/checkout@v2
+    - name: Docker build
+      if: success() && matrix.OS_NAME == 'Linux'
+      env:
+        IMAGE: ${{ matrix.IMAGE }}
+        RUST_TOOLCHAIN: ${{ matrix.RUST_TOOLCHAIN }}
+      run: |
+          CID=$(docker create -t -w /tmp/wgpu-native -v $PWD:/tmp/src:ro quay.io/pypa/$IMAGE bash -c "\
+            cp -r /tmp/src/. . && \
+            rm -rf ./dist && \
+            export PATH=/root/.cargo/bin:\$PATH && \
+            export USER=root && \
+            curl --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain none && \
+            rustup toolchain install --no-self-update $RUST_TOOLCHAIN && \
+            rustup default $RUST_TOOLCHAIN && \
+            yum install zip -y && \
+            make package")
+          docker start -ai $CID
+          mkdir -p dist
+          docker cp $CID:/tmp/wgpu-native/dist/. dist/.
+          docker rm $CID
+    - name: Host build
+      if: success() && matrix.OS_NAME != 'Linux'
+      env:
+        RUST_TOOLCHAIN: ${{ matrix.RUST_TOOLCHAIN }}
+        MACOSX_DEPLOYMENT_TARGET: ${{ matrix.MACOSX_DEPLOYMENT_TARGET }}
+      run: |
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --default-toolchain none
+        export PATH=$HOME/.cargo/bin:$PATH
+        rustup toolchain install --no-self-update $RUST_TOOLCHAIN
+        rustup default $RUST_TOOLCHAIN
+        make package
+      shell: bash
+    - name: Pre-publish
+      env:
+        OS_NAME: ${{ matrix.OS_NAME }}
+        ARCH: ${{ matrix.ARCH }}
+      run: |
+        mkdir -p ./dist
+        mv dist/*debug*.zip ./dist/wgpu-$OS_NAME-$ARCH-debug.zip
+        mv dist/*release*.zip ./dist/wgpu-$OS_NAME-$ARCH-release.zip
+      shell: bash
+    - name: Publish
+      uses: actions/upload-artifact@v2
+      with:
+        path: dist
+        name: dist
+
+  Release:
+    needs: Build
     runs-on: ubuntu-16.04
-    if: success()  # and github.event_name == 'tag'
+    if: success() and github.event_name == 'tag'
     steps:
     - uses: actions/checkout@v2
     - name: Download assets
