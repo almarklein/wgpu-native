@@ -95,6 +95,7 @@ jobs:
         rustup toolchain install --no-self-update $RUST_TOOLCHAIN
         rustup default $RUST_TOOLCHAIN
         make package
+      shell: bash
     - name: Pre-publish
       env:
         OS_NAME: ${{ matrix.OS_NAME }}
@@ -104,6 +105,7 @@ jobs:
         mkdir -p ./dist
         mv dist/*debug*.zip ./dist/wgpu-$OS_NAME-$ARCH-debug.zip
         mv dist/*release*.zip ./dist/wgpu-$OS_NAME-$ARCH-release.zip
+      shell: bash
     - name: Publish
       uses: actions/upload-artifact@v2
       with:
