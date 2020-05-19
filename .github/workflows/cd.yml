@@ -21,7 +21,7 @@ jobs:
         GITHUB_SHA: ${{ github.sha }}
       run: |
           set -ex
-          $GITHUB_SHA > ../commit-sha
+          echo $GITHUB_SHA > commit-sha
     - name: Publish commit-sha
       uses: actions/upload-artifact@v2
       with:
