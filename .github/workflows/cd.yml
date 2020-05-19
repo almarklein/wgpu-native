@@ -28,7 +28,7 @@ jobs:
         name: dist
 
     Release:
-    needs: Build
+    needs: Prepare
     runs-on: ubuntu-16.04
     if: success()  # and github.event_name == 'tag'
     steps:
