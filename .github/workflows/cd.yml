@@ -27,7 +27,7 @@ jobs:
         path: commit-sha
         name: dist
 
-Build:
+  Build:
     needs: Prepare
     runs-on: ${{ matrix.vmImage }}
     strategy:
@@ -89,20 +89,20 @@ Build:
         RUST_TOOLCHAIN: ${{ matrix.RUST_TOOLCHAIN }}
         MACOSX_DEPLOYMENT_TARGET: ${{ matrix.MACOSX_DEPLOYMENT_TARGET }}
       run: |
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --default-toolchain none
-        export PATH=$HOME/.cargo/bin:$PATH
-        rustup toolchain install --no-self-update $RUST_TOOLCHAIN
-        rustup default $RUST_TOOLCHAIN
-        make package
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --default-toolchain none
+          export PATH=$HOME/.cargo/bin:$PATH
+          rustup toolchain install --no-self-update $RUST_TOOLCHAIN
+          rustup default $RUST_TOOLCHAIN
+          make package
       shell: bash
     - name: Pre-publish
       env:
         OS_NAME: ${{ matrix.OS_NAME }}
         ARCH: ${{ matrix.ARCH }}
       run: |
-        mkdir -p ./dist
-        mv dist/*debug*.zip ./dist/wgpu-$OS_NAME-$ARCH-debug.zip
-        mv dist/*release*.zip ./dist/wgpu-$OS_NAME-$ARCH-release.zip
+          mkdir -p ./dist
+          mv dist/*debug*.zip ./dist/wgpu-$OS_NAME-$ARCH-debug.zip
+          mv dist/*release*.zip ./dist/wgpu-$OS_NAME-$ARCH-release.zip
       shell: bash
     - name: Publish
       uses: actions/upload-artifact@v2
