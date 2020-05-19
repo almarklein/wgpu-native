@@ -87,7 +87,7 @@ jobs:
       if: success() && matrix.OS_NAME != 'Linux'
       env:
         RUST_TOOLCHAIN: ${{ matrix.RUST_TOOLCHAIN }}
-        MACOSX_DEPLOYMENT_TARGET: ${{ MACOSX_DEPLOYMENT_TARGET }}
+        MACOSX_DEPLOYMENT_TARGET: ${{ matrix.MACOSX_DEPLOYMENT_TARGET }}
       run: |
         set -ex
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path --default-toolchain none
@@ -97,7 +97,7 @@ jobs:
         make package
     - name: Pre-publish
       env:
-        OS_NAME: ${{ OS_NAME }}
+        OS_NAME: ${{ matrix.OS_NAME }}
         ARCH: ${{ matrix.ARCH }}
       run: |
         set -ex
