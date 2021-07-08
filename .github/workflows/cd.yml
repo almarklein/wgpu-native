@@ -86,7 +86,7 @@ jobs:
             rustup toolchain install --no-self-update $RUST_TOOLCHAIN && \
             rustup default $RUST_TOOLCHAIN && \
             yum install zip yum-utils centos-release-scl -y && \
-            yum-config-manager --enable rhel-server-rhscl-7-rpms && \
+            yum-config-manager --enable rhel-server-rhscl-7-rpms --enable rhel-7-server-devtools-rpms && \
             yum install llvm-toolset-7 -y && \
             scl enable llvm-toolset-7 'make package'")
           docker start -ai $CID
