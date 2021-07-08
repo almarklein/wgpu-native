@@ -85,8 +85,10 @@ jobs:
             curl --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain none && \
             rustup toolchain install --no-self-update $RUST_TOOLCHAIN && \
             rustup default $RUST_TOOLCHAIN && \
-            yum install zip clang -y && \
-            make package")
+            yum install zip yum-utils centos-release-scl -y && \
+            yum-config-manager --enable rhel-server-rhscl-7-rpms && \
+            yum install llvm-toolset-7 -y && \
+            scl enable llvm-toolset-7 'make package'")
           docker start -ai $CID
           mkdir -p dist
           docker cp $CID:/tmp/wgpu-native/dist/. dist/.
