@@ -7,7 +7,7 @@ FFI_DIR:=ffi
 BUILD_DIR:=build
 CREATE_BUILD_DIR:=
 OUTPUT_DIR:=
-LIB_NAME:=wgpu_native
+LIB_NAME:=libwgpu_native
 
 WILDCARD_SOURCE:=$(wildcard src/*.rs)
 
@@ -15,10 +15,15 @@ GIT_TAG=$(shell git describe --abbrev=0 --tags)
 GIT_TAG_FULL=$(shell git describe --tags)
 OS_NAME=
 
-ifeq (,$(TARGET))
-	CHECK_TARGET_FLAG=
-else
-	CHECK_TARGET_FLAG=--target $(TARGET)
+EXTRA_BUILD_ARGS=
+TARGET_DIR=target
+ifdef TARGET
+	EXTRA_BUILD_ARGS=--target $(TARGET)
+	TARGET_DIR=target/$(TARGET)
+endif
+
+ifndef ARCHIVE_NAME
+	ARCHIVE_NAME=wgpu-$(TARGET)
 endif
 
 ifeq ($(OS),Windows_NT)
@@ -46,7 +51,6 @@ else
 	endif
 endif
 
-
 .PHONY: all check test doc clear \
 	example-compute example-triangle \
 	run-example-compute run-example-triangle  \
@@ -58,13 +62,13 @@ package: lib-native lib-native-release
 	mkdir -p dist
 	echo "$(GIT_TAG_FULL)" > dist/commit-sha
 	for RELEASE in debug release; do \
-		ARCHIVE=wgpu-$$RELEASE-$(OS_NAME)-$(GIT_TAG).zip; \
+		ARCHIVE=$(ARCHIVE_NAME)-$$RELEASE.zip; \
 		rm -f dist/$$ARCHIVE; \
 		sed 's/webgpu-headers\///' ffi/wgpu.h > wgpu.h ;\
 		if [ $(OS_NAME) = windows ]; then \
-			7z a -tzip dist/$$ARCHIVE ./target/$$RELEASE/$(LIB_NAME).$(LIB_EXTENSION) ./target/$$RELEASE/$(LIB_NAME).$(LIB_EXTENSION).lib ./ffi/webgpu-headers/*.h ./wgpu.h ./dist/commit-sha; \
+			7z a -tzip dist/$$ARCHIVE ./$(TARGET_DIR)/$$RELEASE/$(LIB_NAME).$(LIB_EXTENSION) ./target/$$RELEASE/$(LIB_NAME).$(LIB_EXTENSION).lib ./ffi/webgpu-headers/*.h ./wgpu.h ./dist/commit-sha; \
 		else \
-			zip -j dist/$$ARCHIVE target/$$RELEASE/lib$(LIB_NAME).$(LIB_EXTENSION) ./ffi/webgpu-headers/*.h ./wgpu.h ./dist/commit-sha; \
+			zip -j dist/$$ARCHIVE $(TARGET_DIR)/$$RELEASE/$(LIB_NAME).$(LIB_EXTENSION) ./ffi/webgpu-headers/*.h ./wgpu.h ./dist/commit-sha; \
 		fi; \
 		rm wgpu.h ;\
 	done
@@ -86,10 +90,10 @@ clear:
 	cargo clean
 
 lib-native: Cargo.lock Cargo.toml Makefile $(WILDCARD_SOURCE)
-	cargo build
-
+	cargo build $(EXTRA_BUILD_ARGS)
+	
 lib-native-release: Cargo.lock Cargo.toml Makefile $(WILDCARD_SOURCE)
-	cargo build --release
+	cargo build --release $(EXTRA_BUILD_ARGS)
 
 example-compute: lib-native examples/compute/main.c
 	cd examples/compute && $(CREATE_BUILD_DIR) && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. $(GENERATOR_PLATFORM) && cmake --build .
