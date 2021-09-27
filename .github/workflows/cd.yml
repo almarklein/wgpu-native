@@ -139,6 +139,7 @@ jobs:
       shell: bash
     - name: Build
       run: make package
+      shell: bash
     # Upload (same for each build)
     - name: Upload
       uses: actions/upload-artifact@v2
@@ -177,6 +178,7 @@ jobs:
       shell: bash
     - name: Build
       run: make package
+      shell: bash
     # Upload (same for each build)
     - name: Upload
       uses: actions/upload-artifact@v2
