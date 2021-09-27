@@ -97,7 +97,7 @@ jobs:
             apt update && \
             apt install -y clang-3.9 zip && \
             make package")
-          docker start -ai $CID
+          docker start -ai $CID -e TARGET -e ARCHIVE_NAME
           mkdir -p dist
           docker cp $CID:/tmp/wgpu-native/dist/. dist/.
           docker rm $CID
