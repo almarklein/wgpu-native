@@ -73,7 +73,7 @@ package: lib-native lib-native-release
 			mv $(TARGET_DIR)/$$RELEASE/$(LIB_NAME).dll.lib $(TARGET_DIR)/$$RELEASE/$(FINAL_LIB_NAME).lib; \
 			7z a -tzip dist/$$ARCHIVE ./$(TARGET_DIR)/$$RELEASE/$(FINAL_LIB_NAME).$(LIB_EXTENSION) ./target/$$RELEASE/$(FINAL_LIB_NAME).lib ./ffi/webgpu-headers/*.h ./wgpu.h ./dist/commit-sha; \
 		else \
-			mv $(TARGET_DIR)/$$RELEASE/$(LIB_NAME).$(LIB_EXTENSION) $(TARGET_DIR)/$$RELEASE/$(FINAL_LIB_NAME).dll; \
+			mv $(TARGET_DIR)/$$RELEASE/$(LIB_NAME).$(LIB_EXTENSION) $(TARGET_DIR)/$$RELEASE/$(FINAL_LIB_NAME).$(LIB_EXTENSION); \
 			zip -j dist/$$ARCHIVE $(TARGET_DIR)/$$RELEASE/$(FINAL_LIB_NAME).$(LIB_EXTENSION) ./ffi/webgpu-headers/*.h ./wgpu.h ./dist/commit-sha; \
 		fi; \
 		rm wgpu.h ;\
