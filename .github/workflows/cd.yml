@@ -127,7 +127,7 @@ jobs:
     - name: Install Rust toolchain
       uses: actions-rs/toolchain@v1
       with:
-        toolchain: stable
+        toolchain: stable-msvc
         target: ${{ env.TARGET }}
         profile: minimal
         override: true
@@ -166,7 +166,7 @@ jobs:
     - name: Install Rust toolchain
       uses: actions-rs/toolchain@v1
       with:
-        toolchain: stable
+        toolchain: stable-i686-pc-windows-msvc
         target: ${{ env.TARGET }}
         profile: minimal
         override: true
