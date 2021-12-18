@@ -24,9 +24,10 @@ pub unsafe extern "C" fn wgpuInstanceRequestAdapter(
         WGPUSType_AdapterExtras => native::WGPUAdapterExtras)
     );
     let power_preference = match options.powerPreference {
+        native::WGPUPowerPreference_Undefined => wgt::PowerPreference::default(),
         native::WGPUPowerPreference_LowPower => wgt::PowerPreference::LowPower,
         native::WGPUPowerPreference_HighPerformance => wgt::PowerPreference::HighPerformance,
-        _ => wgt::PowerPreference::default(),
+        _ => panic!("Invalid PowerPreference {}", options.powerPreference),
     };
     let backend_bits = match given_backend {
         native::WGPUBackendType_Null => wgt::Backends::all(),
